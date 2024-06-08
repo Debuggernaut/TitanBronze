@@ -25,6 +25,7 @@ local BRONZE_COLOR;
 local BRONZE_SESS_STATUS;
 local BRONZE_PERHOUR_STATUS;
 local BRONZE_STARTINGBRONZE;
+local BRONZE_STARTINGTHREADSTATS;
 local BRONZE_SESSIONSTART;
 local TitanBronze = LibStub("AceAddon-3.0"):NewAddon("TitanBronze")
 local AceTimer = LibStub("AceTimer-3.0")
@@ -727,6 +728,9 @@ print("TG"
 	local sesslength = GetTime() - BRONZE_SESSIONSTART;
 	local perhour = math.floor(sesstotal / sesslength * 3600);
 
+	local totalThreads = math.floor((TitanBronze_GetTotalThreadStats() - BRONZE_STARTINGTHREADSTATS);
+	local perhourThreads = totalThreads / sesslength * 3600);
+
 	coin_str = NiceCash(BRONZE_STARTINGBRONZE, false, false)
 	
 	local sessionMoneyRichText = ""
@@ -756,11 +760,17 @@ print("TG"
 				..TitanUtils_GetColoredText(BRONZE_PERHOUR_STATUS,BRONZE_COLOR)
 				.."\t"..coin_str.."\n";
 		end
+
+		sessionMoneyRichText = sessionMoneyRichText
+			..TitanUtils_GetColoredText("Thread Stats gained", BRONZE_COLOR)
+			.."\t"..totalThreads.."\n"
+			..TitanUtils_GetColoredText("Thread Stats per Hour", BRONZE_COLOR)
+			.."\t"..perhourThreads.."\n"
 	else
 		-- Do not display session info
 	end
 
-	local final_tooltip = TitanUtils_GetBronzeText(L["TITAN_BRONZE_TOOLTIPTEXT"].." : ")
+	local final_tooltip = TitanUtils_GetGoldText(L["TITAN_BRONZE_TOOLTIPTEXT"].." : ")
 
 	local final_server = ""
 	if realmNames == nil or TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
@@ -770,11 +780,11 @@ print("TG"
 	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		final_server = ALL
 	end
-	final_server = TitanUtils_GetBronzeText(final_server.." : ")
+	final_server = TitanUtils_GetGoldText(final_server.." : ")
 	
 	local final_faction = ""
 	if ignore_faction then
-		final_faction = TitanUtils_GetBronzeText(ALL)
+		final_faction = TitanUtils_GetGoldText(ALL)
 	elseif faction == TITAN_ALLIANCE then
 		final_faction = "|cff5b92e5"..FACTION_ALLIANCE.._G["FONT_COLOR_CODE_CLOSE"]
 --		final_faction = TitanUtils_GetGreenText(FACTION_ALLIANCE)
@@ -813,6 +823,12 @@ local function Sort_Toggle()
 	TitanToggleVar(TITAN_BRONZE_ID, "SortByName")
 end
 
+function TitanBronze_GetTotalThreadStats()
+	local c,s={0,1,2,3,4,5,6,7,148},0
+	for i=1,9 do s=s+C_CurrencyInfo.GetCurrencyInfo(2853+c[i]).quantity end
+	return s
+end
+
 --[[
 -- *******************************************************************************************
 -- NAME: ResetSession()
@@ -821,6 +837,7 @@ end
 --]]
 local function ResetSession()
 	BRONZE_STARTINGBRONZE = C_CurrencyInfo.GetCurrencyInfo(2778).quantity;
+	BRONZE_STARTINGTHREADSTATS = TitanBronze_GetTotalThreadStats();
 	BRONZE_SESSIONSTART = GetTime();
 	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_BRONZE_SESSION_RESET"]));
 end
@@ -874,6 +891,7 @@ local function Initialize_Array(self)
 --]]
 	end
 	BRONZE_STARTINGBRONZE = C_CurrencyInfo.GetCurrencyInfo(2778).quantity;
+	BRONZE_STARTINGTHREADSTATS = TitanBronze_GetTotalThreadStats();
 	BRONZE_SESSIONSTART = GetTime();
 	BRONZE_INITIALIZED = true;
 
