@@ -728,8 +728,8 @@ print("TG"
 	local sesslength = GetTime() - BRONZE_SESSIONSTART;
 	local perhour = math.floor(sesstotal / sesslength * 3600);
 
-	local totalThreads = math.floor((TitanBronze_GetTotalThreadStats() - BRONZE_STARTINGTHREADSTATS);
-	local perhourThreads = totalThreads / sesslength * 3600);
+	local totalThreads = math.floor((TitanBronze_GetTotalThreadStats() - BRONZE_STARTINGTHREADSTATS));
+	local perhourThreads = math.floor(totalThreads / sesslength * 3600);
 
 	coin_str = NiceCash(BRONZE_STARTINGBRONZE, false, false)
 	
