@@ -1,9 +1,9 @@
 ## Interface: 30403
-## Title: Titan Panel [|cffeda55fGold|r] |cff00aa008.0.12|r
+## Title: Titan Panel [|cffeda55fBronze|r] |cff00aa008.0.12|r
 ## Version: 8.0.12
 ## Notes: Keeps track of all gold held by a player's toons on a per server/faction basis.
 ## Author: Titan Panel Development Team (http://www.titanpanel.org)
-## SavedVariables: GoldSave
+## SavedVariables: BronzeSave
 ## OptionalDeps:  
 ## Dependencies: TitanClassic
-TitanGold.lua
+TitanBronze.lua

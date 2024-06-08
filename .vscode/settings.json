@@ -1,0 +1,14 @@
+{
+    "Lua.diagnostics.globals": [
+        "StaticPopupDialogs",
+        "StaticPopup_Show",
+        "DEFAULT_CHAT_FRAME",
+        "ALL",
+        "ACCEPT",
+        "CANCEL",
+        "FONT_COLOR_CODE_CLOSE",
+        "FACTION_ALLIANCE",
+        "FACTION_HORDE",
+        "FACTION_OTHER"
+    ]
+}

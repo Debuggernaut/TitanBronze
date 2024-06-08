@@ -1,36 +1,36 @@
 ---@diagnostic disable: duplicate-set-field
 --[[
 -- **************************************************************************
--- * TitanGold.lua
+-- * TitanBronze.lua
 -- *
 -- * By: The Titan Panel Development Team
 -- **************************************************************************
 --]]
 
 -- ******************************** Constants *******************************
-local TITAN_GOLD_ID = "Gold";
-local TITAN_BUTTON = "TitanPanel"..TITAN_GOLD_ID.."Button"
-local TITAN_GOLD_COUNT_FORMAT = "%d";
-local TITAN_GOLD_VERSION = TITAN_VERSION;
-local TITAN_GOLD_SPACERBAR = "-----------------------";
-local TITAN_GOLD_BLUE = {r=0.4,b=1,g=0.4};
-local TITAN_GOLD_RED = {r=1,b=0,g=0};
-local TITAN_GOLD_GREEN = {r=0,b=0,g=1};
-local updateTable = {TITAN_GOLD_ID, TITAN_PANEL_UPDATE_TOOLTIP };
+local TITAN_BRONZE_ID = "Bronze";
+local TITAN_BUTTON = "TitanPanel"..TITAN_BRONZE_ID.."Button"
+local TITAN_BRONZE_COUNT_FORMAT = "%d";
+local TITAN_BRONZE_VERSION = TITAN_VERSION;
+local TITAN_BRONZE_SPACERBAR = "-----------------------";
+local TITAN_BRONZE_BLUE = {r=0.4,b=1,g=0.4};
+local TITAN_BRONZE_RED = {r=1,b=0,g=0};
+local TITAN_BRONZE_GREEN = {r=0,b=0,g=1};
+local updateTable = {TITAN_BRONZE_ID, TITAN_PANEL_UPDATE_TOOLTIP };
 
 -- ******************************** Variables *******************************
-local GOLD_INITIALIZED = false;
-local GOLD_INDEX = "";
-local GOLD_COLOR;
-local GOLD_SESS_STATUS;
-local GOLD_PERHOUR_STATUS;
-local GOLD_STARTINGGOLD;
-local GOLD_SESSIONSTART;
-local TitanGold = LibStub("AceAddon-3.0"):NewAddon("TitanGold")
+local BRONZE_INITIALIZED = false;
+local BRONZE_INDEX = "";
+local BRONZE_COLOR;
+local BRONZE_SESS_STATUS;
+local BRONZE_PERHOUR_STATUS;
+local BRONZE_STARTINGBRONZE;
+local BRONZE_SESSIONSTART;
+local TitanBronze = LibStub("AceAddon-3.0"):NewAddon("TitanBronze")
 local AceTimer = LibStub("AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(TITAN_ID, true)
-local GoldTimer = {};
-local GoldTimerRunning = false
+local BronzeTimer = {};
+local BronzeTimerRunning = false
 local _G = getfenv(0);
 local realmName = GetRealmName();
 local realmNames = GetAutoCompleteRealms();
@@ -56,7 +56,7 @@ Add commas or period in the value given as needed
 local function comma_value(amount)
 	local formatted = amount
 	local k
-	local sep = (TitanGetVar(TITAN_GOLD_ID, "UseSeperatorComma") and "UseComma" or "UsePeriod")
+	local sep = (TitanGetVar(TITAN_BRONZE_ID, "UseSeperatorComma") and "UseComma" or "UsePeriod")
 	while true do
 		if sep == "UseComma" then formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2') end
 		if sep == "UsePeriod" then formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2') end
@@ -90,18 +90,18 @@ local function NiceCash(value, show_zero, show_neg)
 	local font_size = TitanPanelGetVar("FontSize")
 	local icon_pre = "|TInterface\\MoneyFrame\\"
 	local icon_post = ":"..font_size..":"..font_size..":2:0|t"
-	local g_icon = icon_pre.."UI-GoldIcon"..icon_post
+	local g_icon = icon_pre.."UI-BronzeIcon"..icon_post
 	local s_icon = icon_pre.."UI-SilverIcon"..icon_post
 	local c_icon = icon_pre.."UI-CopperIcon"..icon_post
 	-- build the coin label strings based on the user selections
-	local show_labels = TitanGetVar(TITAN_GOLD_ID, "ShowCoinLabels")
-	local show_icons = TitanGetVar(TITAN_GOLD_ID, "ShowCoinIcons")
-	local c_lab = (show_labels and L["TITAN_GOLD_COPPER"]) or (show_icons and c_icon) or ""
-	local s_lab = (show_labels and L["TITAN_GOLD_SILVER"]) or (show_icons and s_icon) or ""
-	local g_lab = (show_labels and L["TITAN_GOLD_GOLD"]) or (show_icons and g_icon) or ""
+	local show_labels = TitanGetVar(TITAN_BRONZE_ID, "ShowCoinLabels")
+	local show_icons = TitanGetVar(TITAN_BRONZE_ID, "ShowCoinIcons")
+	local c_lab = (show_labels and L["TITAN_BRONZE_COPPER"]) or (show_icons and c_icon) or ""
+	local s_lab = (show_labels and L["TITAN_BRONZE_SILVER"]) or (show_icons and s_icon) or ""
+	local g_lab = (show_labels and L["TITAN_BRONZE_BRONZE"]) or (show_icons and g_icon) or ""
 
 	-- show the money in highlight or coin color based on user selection
-	if TitanGetVar(TITAN_GOLD_ID, "ShowColoredText") then
+	if TitanGetVar(TITAN_BRONZE_ID, "ShowColoredText") then
 		gc = "|cFFFFFF00"
 		sc = "|cFFCCCCCC"
 		cc = "|cFFFF6600"
@@ -129,9 +129,9 @@ local function NiceCash(value, show_zero, show_neg)
 		end
 	elseif amount > 0 then
 		-- figure out the gold - silver - copper components
-		gold = (math.floor(amount / agold) or 0)
+		gold = 0--(math.floor(amount / agold) or 0)
 		amount = amount - (gold * agold);
-		silver = (math.floor(amount / asilver) or 0)
+		silver = 0--(math.floor(amount / asilver) or 0)
 		copper = amount - (silver * asilver)
 		-- now make the coin strings
 		if gold > 0 then
@@ -146,7 +146,7 @@ local function NiceCash(value, show_zero, show_neg)
 		end
 	end
 
-	if TitanGetVar(TITAN_GOLD_ID, "ShowGoldOnly") then
+	if TitanGetVar(TITAN_BRONZE_ID, "ShowBronzeOnly") then
 		silver_str = ""
 		copper_str = ""
 		-- special case for those who want to show only gold
@@ -179,7 +179,7 @@ local function ShowMenuButtons(faction)
 	local info = {};
 	local name = GetUnitName("player");
 	local server = realmName;
-	for index, money in pairs(GoldSave) do
+	for index, money in pairs(BronzeSave) do
 		local character, charserver, char_faction = GetIndexInfo(index) --string.match(index, "(.*)_(.*)::"..faction);
 		if character 
 		and (char_faction == faction) 
@@ -189,12 +189,12 @@ local function ShowMenuButtons(faction)
 			info.keepShownOnClick = true;
 			info.checked = function()
 				local rementry = character.."_"..charserver.."::"..faction;
-				return GoldSave[rementry].show
+				return BronzeSave[rementry].show
 			end
 			info.func = function()
 				local rementry = character.."_"..charserver.."::"..faction;
-				GoldSave[rementry].show = not GoldSave[rementry].show;
-				TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+				BronzeSave[rementry].show = not BronzeSave[rementry].show;
+				TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 			end
 			TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 		end
@@ -205,7 +205,7 @@ local function DeleteMenuButtons(faction)
 	local info = {};
 	local name = GetUnitName("player");
 	local server = realmName;
-	for index, money in pairs(GoldSave) do
+	for index, money in pairs(BronzeSave) do
 		local character, charserver, char_faction = GetIndexInfo(index) --string.match(index, "(.*)_(.*)::"..faction);
 		info.notCheckable = true
 		if character 
@@ -215,8 +215,8 @@ local function DeleteMenuButtons(faction)
 			info.value = character;
 			info.func = function()
 				local rementry = character.."_"..charserver.."::"..faction;
-				GoldSave[rementry] = nil;
-				TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+				BronzeSave[rementry] = nil;
+				TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 			end
 			-- cannot delete current character
 			if name == character and server == charserver then
@@ -231,73 +231,73 @@ end
 
 local function ShowProperLabels(chosen)
 	if chosen == "ShowCoinNone" then
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinNone", true);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinLabels", false);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinIcons", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinNone", true);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinLabels", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinIcons", false);
 	end
 	if chosen == "ShowCoinLabels" then
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinNone", false);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinLabels", true);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinIcons", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinNone", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinLabels", true);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinIcons", false);
 	end
 	if chosen == "ShowCoinIcons" then
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinNone", false);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinLabels", false);
-		TitanSetVar(TITAN_GOLD_ID, "ShowCoinIcons", true);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinNone", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinLabels", false);
+		TitanSetVar(TITAN_BRONZE_ID, "ShowCoinIcons", true);
 	end
-	TitanPanelButton_UpdateButton(TITAN_GOLD_ID);
+	TitanPanelButton_UpdateButton(TITAN_BRONZE_ID);
 end
 
 local function Seperator(chosen)
 	if chosen == "UseSeperatorComma" then
-		TitanSetVar(TITAN_GOLD_ID, "UseSeperatorComma", true);
-		TitanSetVar(TITAN_GOLD_ID, "UseSeperatorPeriod", false);
+		TitanSetVar(TITAN_BRONZE_ID, "UseSeperatorComma", true);
+		TitanSetVar(TITAN_BRONZE_ID, "UseSeperatorPeriod", false);
 	end
 	if chosen == "UseSeperatorPeriod" then
-		TitanSetVar(TITAN_GOLD_ID, "UseSeperatorComma", false);
-		TitanSetVar(TITAN_GOLD_ID, "UseSeperatorPeriod", true);
+		TitanSetVar(TITAN_BRONZE_ID, "UseSeperatorComma", false);
+		TitanSetVar(TITAN_BRONZE_ID, "UseSeperatorPeriod", true);
 	end
-	TitanPanelButton_UpdateButton(TITAN_GOLD_ID);
+	TitanPanelButton_UpdateButton(TITAN_BRONZE_ID);
 end
 
 local function Merger(chosen)
 	if chosen == "MergeServers" then
-		TitanSetVar(TITAN_GOLD_ID, "MergeServers", true);
-		TitanSetVar(TITAN_GOLD_ID, "SeparateServers", false);
-		TitanSetVar(TITAN_GOLD_ID, "AllServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "MergeServers", true);
+		TitanSetVar(TITAN_BRONZE_ID, "SeparateServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "AllServers", false);
 	end
 	if chosen == "SeparateServers" then
-		TitanSetVar(TITAN_GOLD_ID, "MergeServers", false);
-		TitanSetVar(TITAN_GOLD_ID, "SeparateServers", true);
-		TitanSetVar(TITAN_GOLD_ID, "AllServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "MergeServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "SeparateServers", true);
+		TitanSetVar(TITAN_BRONZE_ID, "AllServers", false);
 	end
 	if chosen == "AllServers" then
-		TitanSetVar(TITAN_GOLD_ID, "MergeServers", false);
-		TitanSetVar(TITAN_GOLD_ID, "SeparateServers", false);
-		TitanSetVar(TITAN_GOLD_ID, "AllServers", true);
+		TitanSetVar(TITAN_BRONZE_ID, "MergeServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "SeparateServers", false);
+		TitanSetVar(TITAN_BRONZE_ID, "AllServers", true);
 	end
-	TitanPanelButton_UpdateButton(TITAN_GOLD_ID);
+	TitanPanelButton_UpdateButton(TITAN_BRONZE_ID);
 end
 
 --[[
 -- *******************************************************************************************
--- NAME: TitanPanelGoldGPH_Toggle()
+-- NAME: TitanPanelBronzeGPH_Toggle()
 -- DESC: This toggles if the player wants to see the gold/hour stats
 -- *******************************************************************************************
 --]]
-function TitanPanelGoldGPH_Toggle()
-	TitanToggleVar(TITAN_GOLD_ID, "DisplayGoldPerHour")
+function TitanPanelBronzeGPH_Toggle()
+	TitanToggleVar(TITAN_BRONZE_ID, "DisplayBronzePerHour")
 
-	if TitanGetVar(TITAN_GOLD_ID, "DisplayGoldPerHour") then
-		if GoldTimerRunning then
+	if TitanGetVar(TITAN_BRONZE_ID, "DisplayBronzePerHour") then
+		if BronzeTimerRunning then
 			-- Do not create a new one
 		else
-			GoldTimer = AceTimer:ScheduleRepeatingTimer(TitanPanelPluginHandle_OnUpdate, 1, updateTable)
-			GoldTimerRunning = true
+			BronzeTimer = AceTimer:ScheduleRepeatingTimer(TitanPanelPluginHandle_OnUpdate, 1, updateTable)
+			BronzeTimerRunning = true
 		end
-	elseif GoldTimer and not TitanGetVar(TITAN_GOLD_ID, "DisplayGoldPerHour") then
-		AceTimer:CancelTimer(GoldTimer)
-		GoldTimerRunning = false
+	elseif BronzeTimer and not TitanGetVar(TITAN_BRONZE_ID, "DisplayBronzePerHour") then
+		AceTimer:CancelTimer(BronzeTimer)
+		BronzeTimerRunning = false
 	end
 end
 
@@ -305,7 +305,7 @@ local function DisplayOptions()
 
 	local info = {};
 	info.notCheckable = true
-	info.text = L["TITAN_GOLD_SORT_BY"];
+	info.text = L["TITAN_BRONZE_SORT_BY"];
 	info.value = "Sorting";
 	info.hasArrow = 1;
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
@@ -317,24 +317,24 @@ local function DisplayOptions()
 	--  - Merge : connected / merged servers
 	--  - All : any server
 	local info = {};
-	info.text = L["TITAN_GOLD_SEPARATE"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "SeparateServers");
+	info.text = L["TITAN_BRONZE_SEPARATE"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "SeparateServers");
 	info.func = function()
 		Merger("SeparateServers")
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 	local info = {};
-	info.text = L["TITAN_GOLD_MERGE"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "MergeServers");
+	info.text = L["TITAN_BRONZE_MERGE"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "MergeServers");
 	info.func = function()
 		Merger("MergeServers")
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 	local info = {};
-	info.text = L["TITAN_GOLD_ALL"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "AllServers");
+	info.text = L["TITAN_BRONZE_ALL"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "AllServers");
 	info.func = function()
 		Merger("AllServers")
 	end
@@ -344,11 +344,11 @@ local function DisplayOptions()
 
 	-- Option to ignore faction - per 9.2.5 changes
 	local info = {};
-	info.text = L["TITAN_GOLD_IGNORE_FACTION"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "IgnoreFaction");
+	info.text = L["TITAN_BRONZE_IGNORE_FACTION"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "IgnoreFaction");
 	info.func = function()
-		TitanToggleVar(TITAN_GOLD_ID, "IgnoreFaction");
-		TitanPanelButton_UpdateButton(TITAN_GOLD_ID);
+		TitanToggleVar(TITAN_BRONZE_ID, "IgnoreFaction");
+		TitanPanelButton_UpdateButton(TITAN_BRONZE_ID);
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
@@ -356,24 +356,24 @@ local function DisplayOptions()
 
 	-- What labels to show next to money none / text / icon
 	local info = {};
-	info.text = L["TITAN_GOLD_COIN_NONE"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "ShowCoinNone");
+	info.text = L["TITAN_BRONZE_COIN_NONE"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "ShowCoinNone");
 	info.func = function()
 		ShowProperLabels("ShowCoinNone")
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 	local info = {};
-	info.text = L["TITAN_GOLD_COIN_LABELS"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "ShowCoinLabels");
+	info.text = L["TITAN_BRONZE_COIN_LABELS"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "ShowCoinLabels");
 	info.func = function()
 		ShowProperLabels("ShowCoinLabels")
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 	local info = {};
-	info.text = L["TITAN_GOLD_COIN_ICONS"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "ShowCoinIcons");
+	info.text = L["TITAN_BRONZE_COIN_ICONS"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "ShowCoinIcons");
 	info.func = function()
 		ShowProperLabels("ShowCoinIcons")
 	end
@@ -383,11 +383,11 @@ local function DisplayOptions()
 
 	-- Show gold only option - no silver, no copper
 	info = {};
-	info.text = L["TITAN_GOLD_ONLY"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "ShowGoldOnly");
+	info.text = L["TITAN_BRONZE_ONLY"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "ShowBronzeOnly");
 	info.func = function()
-		TitanToggleVar(TITAN_GOLD_ID, "ShowGoldOnly");
-		TitanPanelButton_UpdateButton(TITAN_GOLD_ID);
+		TitanToggleVar(TITAN_BRONZE_ID, "ShowBronzeOnly");
+		TitanPanelButton_UpdateButton(TITAN_BRONZE_ID);
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
@@ -396,7 +396,7 @@ local function DisplayOptions()
 	-- Use comma or period as separater on gold
 	local info = {};
 	info.text = L["TITAN_PANEL_USE_COMMA"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "UseSeperatorComma");
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "UseSeperatorComma");
 	info.func = function()
 		Seperator("UseSeperatorComma")
 	end
@@ -404,7 +404,7 @@ local function DisplayOptions()
 
 	local info = {};
 	info.text = L["TITAN_PANEL_USE_PERIOD"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "UseSeperatorPeriod");
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "UseSeperatorPeriod");
 	info.func = function()
 		Seperator("UseSeperatorPeriod")
 	end
@@ -414,10 +414,10 @@ local function DisplayOptions()
 
 	-- Show session info
 	info = {};
-	info.text = L["TITAN_GOLD_SHOW_STATS_TITLE"];
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "ShowSessionInfo");
+	info.text = L["TITAN_BRONZE_SHOW_STATS_TITLE"];
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "ShowSessionInfo");
 	info.func = function()
-		TitanToggleVar(TITAN_GOLD_ID, "ShowSessionInfo");
+		TitanToggleVar(TITAN_BRONZE_ID, "ShowSessionInfo");
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
@@ -425,10 +425,10 @@ local function DisplayOptions()
 
 	-- Function to toggle gold per hour sort
 	info = {};
-	info.text = L["TITAN_GOLD_TOGGLE_GPH_SHOW"]
-	info.checked = TitanGetVar(TITAN_GOLD_ID, "DisplayGoldPerHour");
+	info.text = L["TITAN_BRONZE_TOGGLE_GPH_SHOW"]
+	info.checked = TitanGetVar(TITAN_BRONZE_ID, "DisplayBronzePerHour");
 	info.func = function()
-		TitanPanelGoldGPH_Toggle()
+		TitanPanelBronzeGPH_Toggle()
 	end
 	TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
@@ -448,11 +448,11 @@ end
 
 --[[
 -- *******************************************************************************************
--- NAME: TotalGold()
+-- NAME: TotalBronze()
 -- DESC: Calculates total gold for display per user selections
 -- *******************************************************************************************
 --]]
-local function TotalGold()
+local function TotalBronze()
 	local ttlgold = 0;
 	local cnt = 0;
 	local countelements = 0;
@@ -460,21 +460,21 @@ local function TotalGold()
 	local coin_str = ""
 	local character, charserver = "", ""
 	local char_faction = ""
-	local ignore_faction = TitanGetVar(TITAN_GOLD_ID, "IgnoreFaction")
+	local ignore_faction = TitanGetVar(TITAN_BRONZE_ID, "IgnoreFaction")
 	
 	for _ in pairs (realmNames) do 
 		countelements = countelements + 1 
 	end
 
-	if TitanGetVar(TITAN_GOLD_ID, "SeparateServers") then
+	if TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 		-- Parse the database and display all characters on this server
-		GoldSave[GOLD_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = GetMoney()
 
-		for index, money in pairs(GoldSave) do
+		for index, money in pairs(BronzeSave) do
 			character, charserver, char_faction = GetIndexInfo(index)
 			if (character) and (charserver == realmName) then
 				if ignore_faction or (char_faction == faction) then
-					ttlgold = ToonAdd(GoldSave[index].show, GoldSave[index].gold, ttlgold)
+					ttlgold = ToonAdd(BronzeSave[index].show, BronzeSave[index].gold, ttlgold)
 				else
 					-- Do not show per flags
 				end
@@ -482,12 +482,12 @@ local function TotalGold()
 				-- Toon is not on connected / merged server
 			end
 		end
-	elseif TitanGetVar(TITAN_GOLD_ID, "MergeServers") then
+	elseif TitanGetVar(TITAN_BRONZE_ID, "MergeServers") then
 		-- Parse the database and display characters on merged / connected servers
 		for ms = 1, countelements do
-			GoldSave[GOLD_INDEX].gold = GetMoney()
+			BronzeSave[BRONZE_INDEX].gold = GetMoney()
 
-			for index, money in pairs(GoldSave) do
+			for index, money in pairs(BronzeSave) do
 				character, charserver, char_faction = GetIndexInfo(index)
 				-- GetAutoCompleteRealms removes spaces, idk why... 
 				if (charserver) then
@@ -496,7 +496,7 @@ local function TotalGold()
 
 				if (character) and (charserver == realmNames[ms]) then
 					if ignore_faction or (char_faction == faction) then
-						ttlgold = ToonAdd(GoldSave[index].show, GoldSave[index].gold, ttlgold)
+						ttlgold = ToonAdd(BronzeSave[index].show, BronzeSave[index].gold, ttlgold)
 					else
 						-- Do not show per flags
 					end
@@ -505,15 +505,15 @@ local function TotalGold()
 				end
 			end
 		end
-	elseif TitanGetVar(TITAN_GOLD_ID, "AllServers") then
+	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		-- Parse the database and display characters on all servers
-		GoldSave[GOLD_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = GetMoney()
 
-		for index, money in pairs(GoldSave) do
+		for index, money in pairs(BronzeSave) do
 			character, charserver, char_faction = GetIndexInfo(index)
 			if (character) then
 				if ignore_faction or (char_faction == faction) then
-					ttlgold = ToonAdd(GoldSave[index].show, GoldSave[index].gold, ttlgold)
+					ttlgold = ToonAdd(BronzeSave[index].show, BronzeSave[index].gold, ttlgold)
 				else
 					-- Do not show per flags
 				end
@@ -534,52 +534,52 @@ end
 --[[
 -- *******************************************************************************************
 -- NAME: GetTooltipText()
--- DESC: Gets the tool-tip text, what appears when we hover over Gold on the Titan bar.
+-- DESC: Gets the tool-tip text, what appears when we hover over Bronze on the Titan bar.
 -- *******************************************************************************************
 --]]
 local function GetTooltipText()
-	local GoldSaveSorted = {};
+	local BronzeSaveSorted = {};
 	local currentMoneyRichText = "";
 	local countelements = 0;
 	local faction, faction_locale = UnitFactionGroup("Player") -- get localized faction
-	local ignore_faction = TitanGetVar(TITAN_GOLD_ID, "IgnoreFaction")
+	local ignore_faction = TitanGetVar(TITAN_BRONZE_ID, "IgnoreFaction")
 	
 	for _ in pairs (realmNames) do 
 		countelements = countelements + 1 
 	end
 
---	if countelements == 0 or TitanGetVar(TITAN_GOLD_ID, "SeparateServers") then
+--	if countelements == 0 or TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 	-- The check for no connected realms was confusing so use the 'merge' format
 	-- if requested.
-	-- insert all keys from hash into the GoldSaveSorted array
+	-- insert all keys from hash into the BronzeSaveSorted array
 	
-	if TitanGetVar(TITAN_GOLD_ID, "SeparateServers") then
+	if TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 		-- Parse the database and display characters from this server
-		GoldSave[GOLD_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = GetMoney()
 		local char_faction = ""
 		local character, charserver = "", ""
 
-		for index, money in pairs(GoldSave) do
+		for index, money in pairs(BronzeSave) do
 			character, charserver, char_faction = GetIndexInfo(index)
 			if (character) then
 				if (charserver == realmName) then
 					if ignore_faction or (char_faction == faction) then
-						if GoldSave[index].show then
-							table.insert(GoldSaveSorted, index);
+						if BronzeSave[index].show then
+							table.insert(BronzeSaveSorted, index);
 						end
 					end
 				end
 			end
 		end
-	elseif TitanGetVar(TITAN_GOLD_ID, "MergeServers") then
+	elseif TitanGetVar(TITAN_BRONZE_ID, "MergeServers") then
 		-- Parse the database and display characters from merged / connected servers
 		for ms = 1, countelements do
 			local server = realmNames[ms]
-			GoldSave[GOLD_INDEX].gold = GetMoney()
+			BronzeSave[BRONZE_INDEX].gold = GetMoney()
 			local character, charserver = "", ""
 			local char_faction = ""
 
-			for index, money in pairs(GoldSave) do
+			for index, money in pairs(BronzeSave) do
 				character, charserver, char_faction = GetIndexInfo(index)
 				-- GetAutoCompleteRealms removes spaces, idk why... 
 				if (charserver) then
@@ -589,55 +589,55 @@ local function GetTooltipText()
 				if (character) then
 					if (charserver == server) then
 						if ignore_faction or (char_faction == faction) then
-							if GoldSave[index].show then
-								table.insert(GoldSaveSorted, index);
+							if BronzeSave[index].show then
+								table.insert(BronzeSaveSorted, index);
 							end
 						end
 					end
 				end
 			end
 		end
-	elseif TitanGetVar(TITAN_GOLD_ID, "AllServers") then
+	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		-- Parse the database and display characters from all servers
-		GoldSave[GOLD_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = GetMoney()
 		local character, charserver = "", ""
 		local char_faction = ""
 
-		for index, money in pairs(GoldSave) do
-			character, charserver, char_faction = GetToonInfo(GoldSave[index])
+		for index, money in pairs(BronzeSave) do
+			character, charserver, char_faction = GetToonInfo(BronzeSave[index])
 			if (character) then
 				if ignore_faction or (char_faction == faction) then
-					if GoldSave[index].show then
-						table.insert(GoldSaveSorted, index);
+					if BronzeSave[index].show then
+						table.insert(BronzeSaveSorted, index);
 					end
 				end
 			end
 		end
 	end
 
-	local by_realm = TitanGetVar(TITAN_GOLD_ID, "GroupByRealm")
+	local by_realm = TitanGetVar(TITAN_BRONZE_ID, "GroupByRealm")
 	-- This section will sort the array based on user preference
 	-- * by name or by gold amount descending
 	-- * grouping by realm if selected
-	if TitanGetVar(TITAN_GOLD_ID, "SortByName") then
-		table.sort(GoldSaveSorted, function (key1, key2) 
+	if TitanGetVar(TITAN_BRONZE_ID, "SortByName") then
+		table.sort(BronzeSaveSorted, function (key1, key2) 
 			if by_realm then
-				if GoldSave[key1].realm ~= GoldSave[key2].realm then
-					return GoldSave[key1].realm < GoldSave[key2].realm
+				if BronzeSave[key1].realm ~= BronzeSave[key2].realm then
+					return BronzeSave[key1].realm < BronzeSave[key2].realm
 				end
 			end
 
-			return GoldSave[key1].name < GoldSave[key2].name 
+			return BronzeSave[key1].name < BronzeSave[key2].name 
 			end)
 	else
-		table.sort(GoldSaveSorted, function (key1, key2) 
+		table.sort(BronzeSaveSorted, function (key1, key2) 
 			if by_realm then
-				if GoldSave[key1].realm ~= GoldSave[key2].realm then
-					return GoldSave[key1].realm < GoldSave[key2].realm
+				if BronzeSave[key1].realm ~= BronzeSave[key2].realm then
+					return BronzeSave[key1].realm < BronzeSave[key2].realm
 				end
 			end
 
-			return GoldSave[key1].gold > GoldSave[key2].gold 
+			return BronzeSave[key1].gold > BronzeSave[key2].gold 
 			end)
 	end
 
@@ -649,19 +649,19 @@ local function GetTooltipText()
 	local show_dash = false
 	local show_realm = true
 	local character, charserver, char_faction
-	for i = 1, getn(GoldSaveSorted) do
-		character, charserver, char_faction = GetIndexInfo(GoldSaveSorted[i]) --GetToonInfo(GoldSave[GoldSaveSorted[i]])
-		coin_str = NiceCash(GoldSave[GoldSaveSorted[i]].gold, false, false)
+	for i = 1, getn(BronzeSaveSorted) do
+		character, charserver, char_faction = GetIndexInfo(BronzeSaveSorted[i]) --GetToonInfo(BronzeSave[BronzeSaveSorted[i]])
+		coin_str = NiceCash(BronzeSave[BronzeSaveSorted[i]].gold, false, false)
 		show_dash = false
 		show_realm = true
 
-		if (TitanGetVar(TITAN_GOLD_ID, "SeparateServers")) then
+		if (TitanGetVar(TITAN_BRONZE_ID, "SeparateServers")) then
 --			charserver = ""  -- do not repeat the server on each line
 			show_realm = false
-		elseif (TitanGetVar(TITAN_GOLD_ID, "MergeServers")) then
+		elseif (TitanGetVar(TITAN_BRONZE_ID, "MergeServers")) then
 			show_dash = true
 --			charserver = "-"..charserver
-		elseif (TitanGetVar(TITAN_GOLD_ID, "AllServers")) then
+		elseif (TitanGetVar(TITAN_BRONZE_ID, "AllServers")) then
 			show_dash = true
 		end
 
@@ -680,10 +680,10 @@ local function GetTooltipText()
 		if ignore_faction then
 			if char_faction == TITAN_ALLIANCE then
 				faction_text = "-".."|cff5b92e5"
-							..GoldSave[GoldSaveSorted[i]].faction
+							..BronzeSave[BronzeSaveSorted[i]].faction
 							.._G["FONT_COLOR_CODE_CLOSE"]
 			elseif char_faction == TITAN_HORDE then
-				faction_text = "-"..TitanUtils_GetHexText(GoldSave[GoldSaveSorted[i]].faction, "d42447")
+				faction_text = "-"..TitanUtils_GetHexText(BronzeSave[BronzeSaveSorted[i]].faction, "d42447")
 			end
 		end
 		
@@ -700,10 +700,10 @@ print("TG"
 .." "..tostring(counter)
 .." "..tostring(x0)
 .." "..tostring(x1)
-.." "..tostring(getn(GoldSaveSorted))
-.." "..tostring(TitanGetVar(TITAN_GOLD_ID, "SeparateServers"))
-.." "..tostring(TitanGetVar(TITAN_GOLD_ID, "MergeServers"))
-.." "..tostring(TitanGetVar(TITAN_GOLD_ID, "AllServers"))
+.." "..tostring(getn(BronzeSaveSorted))
+.." "..tostring(TitanGetVar(TITAN_BRONZE_ID, "SeparateServers"))
+.." "..tostring(TitanGetVar(TITAN_BRONZE_ID, "MergeServers"))
+.." "..tostring(TitanGetVar(TITAN_BRONZE_ID, "AllServers"))
 .." "..tostring(TITANPANEL_TOOLTIP)
 --.." "..tostring(TITANPANEL_TOOLTIP_X)
 )
@@ -711,70 +711,70 @@ print("TG"
 
 	coin_str = ""
 	-- Display total gold
-	coin_str = NiceCash(TotalGold(), false, false)
+	coin_str = NiceCash(TotalBronze(), false, false)
 	currentMoneyRichText = currentMoneyRichText.."\n"
-		..TITAN_GOLD_SPACERBAR.."\n"
-		..L["TITAN_GOLD_TTL_GOLD"].."\t"..coin_str
+		..TITAN_BRONZE_SPACERBAR.."\n"
+		..L["TITAN_BRONZE_TTL_BRONZE"].."\t"..coin_str
 
 	-- find session earnings and earning per hour
-	local sesstotal = GetMoney() - GOLD_STARTINGGOLD;
+	local sesstotal = GetMoney() - BRONZE_STARTINGBRONZE;
 	local negative = false;
 	if (sesstotal < 0) then
 		sesstotal = math.abs(sesstotal);
 		negative = true;
 	end
 
-	local sesslength = GetTime() - GOLD_SESSIONSTART;
+	local sesslength = GetTime() - BRONZE_SESSIONSTART;
 	local perhour = math.floor(sesstotal / sesslength * 3600);
 
-	coin_str = NiceCash(GOLD_STARTINGGOLD, false, false)
+	coin_str = NiceCash(BRONZE_STARTINGBRONZE, false, false)
 	
 	local sessionMoneyRichText = ""
-	if TitanGetVar(TITAN_GOLD_ID, "ShowSessionInfo") then
-		sessionMoneyRichText = "\n\n"..TitanUtils_GetHighlightText(L["TITAN_GOLD_STATS_TITLE"])
-			.."\n"..L["TITAN_GOLD_START_GOLD"].."\t"..coin_str.."\n"
+	if TitanGetVar(TITAN_BRONZE_ID, "ShowSessionInfo") then
+		sessionMoneyRichText = "\n\n"..TitanUtils_GetHighlightText(L["TITAN_BRONZE_STATS_TITLE"])
+			.."\n"..L["TITAN_BRONZE_START_BRONZE"].."\t"..coin_str.."\n"
 
 		if (negative) then
-			GOLD_COLOR = TITAN_GOLD_RED;
-			GOLD_SESS_STATUS = L["TITAN_GOLD_SESS_LOST"];
-			GOLD_PERHOUR_STATUS = L["TITAN_GOLD_PERHOUR_LOST"];
+			BRONZE_COLOR = TITAN_BRONZE_RED;
+			BRONZE_SESS_STATUS = L["TITAN_BRONZE_SESS_LOST"];
+			BRONZE_PERHOUR_STATUS = L["TITAN_BRONZE_PERHOUR_LOST"];
 		else
-			GOLD_COLOR = TITAN_GOLD_GREEN;
-			GOLD_SESS_STATUS = L["TITAN_GOLD_SESS_EARNED"];
-			GOLD_PERHOUR_STATUS = L["TITAN_GOLD_PERHOUR_EARNED"];
+			BRONZE_COLOR = TITAN_BRONZE_GREEN;
+			BRONZE_SESS_STATUS = L["TITAN_BRONZE_SESS_EARNED"];
+			BRONZE_PERHOUR_STATUS = L["TITAN_BRONZE_PERHOUR_EARNED"];
 		end
 
 		coin_str = NiceCash(sesstotal, true, true)
-	--		..TitanUtils_GetColoredText(GOLD_SESS_STATUS,GOLD_COLOR)
+	--		..TitanUtils_GetColoredText(BRONZE_SESS_STATUS,BRONZE_COLOR)
 		sessionMoneyRichText = sessionMoneyRichText
-			..TitanUtils_GetColoredText(GOLD_SESS_STATUS,GOLD_COLOR)
+			..TitanUtils_GetColoredText(BRONZE_SESS_STATUS,BRONZE_COLOR)
 			.."\t"..coin_str.."\n";
 
-		if TitanGetVar(TITAN_GOLD_ID, "DisplayGoldPerHour") then
+		if TitanGetVar(TITAN_BRONZE_ID, "DisplayBronzePerHour") then
 			coin_str = NiceCash(perhour, true, true)
 			sessionMoneyRichText = sessionMoneyRichText
-				..TitanUtils_GetColoredText(GOLD_PERHOUR_STATUS,GOLD_COLOR)
+				..TitanUtils_GetColoredText(BRONZE_PERHOUR_STATUS,BRONZE_COLOR)
 				.."\t"..coin_str.."\n";
 		end
 	else
 		-- Do not display session info
 	end
 
-	local final_tooltip = TitanUtils_GetGoldText(L["TITAN_GOLD_TOOLTIPTEXT"].." : ")
+	local final_tooltip = TitanUtils_GetBronzeText(L["TITAN_BRONZE_TOOLTIPTEXT"].." : ")
 
 	local final_server = ""
-	if realmNames == nil or TitanGetVar(TITAN_GOLD_ID, "SeparateServers") then
+	if realmNames == nil or TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 		final_server = realmName
-	elseif TitanGetVar(TITAN_GOLD_ID, "MergeServers") then
-		final_server = L["TITAN_GOLD_MERGED"]
-	elseif TitanGetVar(TITAN_GOLD_ID, "AllServers") then
+	elseif TitanGetVar(TITAN_BRONZE_ID, "MergeServers") then
+		final_server = L["TITAN_BRONZE_MERGED"]
+	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		final_server = ALL
 	end
-	final_server = TitanUtils_GetGoldText(final_server.." : ")
+	final_server = TitanUtils_GetBronzeText(final_server.." : ")
 	
 	local final_faction = ""
 	if ignore_faction then
-		final_faction = TitanUtils_GetGoldText(ALL)
+		final_faction = TitanUtils_GetBronzeText(ALL)
 	elseif faction == TITAN_ALLIANCE then
 		final_faction = "|cff5b92e5"..FACTION_ALLIANCE.._G["FONT_COLOR_CODE_CLOSE"]
 --		final_faction = TitanUtils_GetGreenText(FACTION_ALLIANCE)
@@ -785,7 +785,7 @@ print("TG"
 	
 	return ""
 		..currentMoneyRichText.."\n"
-		..TITAN_GOLD_SPACERBAR.."\n"
+		..TITAN_BRONZE_SPACERBAR.."\n"
 		..final_tooltip..final_server..final_faction.."\n"
 		..sessionMoneyRichText
 end
@@ -799,8 +799,8 @@ end
 -- *******************************************************************************************
 --]]
 local function ViewAll_Toggle()
-	TitanToggleVar(TITAN_GOLD_ID, "ViewAll")
-	TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+	TitanToggleVar(TITAN_BRONZE_ID, "ViewAll")
+	TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 end
 
 --[[
@@ -810,7 +810,7 @@ end
 -- *******************************************************************************************
 --]]
 local function Sort_Toggle()
-	TitanToggleVar(TITAN_GOLD_ID, "SortByName")
+	TitanToggleVar(TITAN_BRONZE_ID, "SortByName")
 end
 
 --[[
@@ -820,9 +820,9 @@ end
 -- *******************************************************************************************
 --]]
 local function ResetSession()
-	GOLD_STARTINGGOLD = GetMoney();
-	GOLD_SESSIONSTART = GetTime();
-	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_GOLD_SESSION_RESET"]));
+	BRONZE_STARTINGBRONZE = GetMoney();
+	BRONZE_SESSIONSTART = GetTime();
+	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_BRONZE_SESSION_RESET"]));
 end
 
 --[[
@@ -832,53 +832,53 @@ end
 -- **************************************************************************
 --]]
 local function Initialize_Array(self)
-	if (GOLD_INITIALIZED) then return; end
+	if (BRONZE_INITIALIZED) then return; end
 
 	self:UnregisterEvent("VARIABLES_LOADED");
 
-	-- See if this is a new to toon to Gold
-	if (GoldSave[GOLD_INDEX] == nil) then
-		GoldSave[GOLD_INDEX] = {}
-		GoldSave[GOLD_INDEX] = {gold = GetMoney(), name = UnitName("player")}
+	-- See if this is a new to toon to Bronze
+	if (BronzeSave[BRONZE_INDEX] == nil) then
+		BronzeSave[BRONZE_INDEX] = {}
+		BronzeSave[BRONZE_INDEX] = {gold = GetMoney(), name = UnitName("player")}
 	end
 	
 	-- Ensure the saved vars are usable
-	for index, money in pairs(GoldSave) do
+	for index, money in pairs(BronzeSave) do
 		local character, charserver, char_faction = GetIndexInfo(index) --string.match(index, '(.*)_(.*)::(.*)')
 		
-		-- Could be a new toon to Gold or an updated Gold
-		local show_toon = GoldSave[index].show
+		-- Could be a new toon to Bronze or an updated Bronze
+		local show_toon = BronzeSave[index].show
 		if show_toon == nil then
 			show_toon = true
 		end
-		GoldSave[index].show = show_toon
-		GoldSave[index].realm = charserver  -- added July 2022
+		BronzeSave[index].show = show_toon
+		BronzeSave[index].realm = charserver  -- added July 2022
 		
 		-- added Aug 2022 for #1332. 
 		-- Faction in index was not set for display in tool tip.
 		-- Created localized faction as a field; set every time in case user changes languages
 		if char_faction == TITAN_ALLIANCE then
-			GoldSave[index].faction = FACTION_ALLIANCE
+			BronzeSave[index].faction = FACTION_ALLIANCE
 		elseif char_faction == TITAN_HORDE then
-			GoldSave[index].faction = FACTION_HORDE
+			BronzeSave[index].faction = FACTION_HORDE
 		else
-			GoldSave[index].faction = FACTION_OTHER
+			BronzeSave[index].faction = FACTION_OTHER
 		end
 --[[
 		if character == UnitName("player") and charserver == realmName then
 			local rementry = character.."_"..charserver.."::"..UnitFactionGroup("Player");
-			local showCharacter = GoldSave[rementry].show
+			local showCharacter = BronzeSave[rementry].show
 			if showCharacter == nil then showCharacter = true end
-			GoldSave[GOLD_INDEX] = {gold = GetMoney("player"), show = showCharacter, name = UnitName("player")}
+			BronzeSave[BRONZE_INDEX] = {gold = GetMoney("player"), show = showCharacter, name = UnitName("player")}
 		end
 --]]
 	end
-	GOLD_STARTINGGOLD = GetMoney();
-	GOLD_SESSIONSTART = GetTime();
-	GOLD_INITIALIZED = true;
+	BRONZE_STARTINGBRONZE = GetMoney();
+	BRONZE_SESSIONSTART = GetTime();
+	BRONZE_INITIALIZED = true;
 
 	-- AFTER we say init is done or we'll never show the gold!
-	TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+	TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 end
 
 --[[
@@ -888,22 +888,22 @@ end
 -- **************************************************************************
 --]]
 local function ClearData(self)
-	GOLD_INITIALIZED = false;
+	BRONZE_INITIALIZED = false;
 
-	GoldSave = {};
+	BronzeSave = {};
 	Initialize_Array(self);
 
-	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_GOLD_DB_CLEARED"]));
+	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_BRONZE_DB_CLEARED"]));
 end
 
-local function TitanGold_ClearDB()
-	StaticPopupDialogs["TITANGOLD_CLEAR_DATABASE"] = {
+local function TitanBronze_ClearDB()
+	StaticPopupDialogs["TITANBRONZE_CLEAR_DATABASE"] = {
 		text = TitanUtils_GetNormalText(L["TITAN_PANEL_MENU_TITLE"].." "
-			..L["TITAN_GOLD_MENU_TEXT"]).."\n\n"..L["TITAN_GOLD_CLEAR_DATA_WARNING"],
+			..L["TITAN_BRONZE_MENU_TEXT"]).."\n\n"..L["TITAN_BRONZE_CLEAR_DATA_WARNING"],
 		button1 = ACCEPT,
 		button2 = CANCEL,
 		OnAccept = function(self)
-			local frame = _G["TitanPanelGoldButton"]
+			local frame = _G["TitanPanelBronzeButton"]
 			ClearData(frame)
 		end,
 		showAlert = 1,
@@ -911,7 +911,7 @@ local function TitanGold_ClearDB()
 		whileDead = 1,
 		hideOnEscape = 1
 	};
-	StaticPopup_Show("TITANGOLD_CLEAR_DATABASE");
+	StaticPopup_Show("TITANBRONZE_CLEAR_DATABASE");
 end
 
 --[[
@@ -923,20 +923,20 @@ end
 local function CreateMenu()
 	if TitanPanelRightClickMenu_GetDropdownLevel() == 1 then
 		-- Menu title
-		TitanPanelRightClickMenu_AddTitle(L["TITAN_GOLD_ITEMNAME"]);
+		TitanPanelRightClickMenu_AddTitle(L["TITAN_BRONZE_ITEMNAME"]);
 
 		-- Function to toggle button gold view
 		local info = {};
-		info.text = L["TITAN_GOLD_TOGGLE_ALL_TEXT"]
-		info.checked = TitanGetVar(TITAN_GOLD_ID, "ViewAll");
+		info.text = L["TITAN_BRONZE_TOGGLE_ALL_TEXT"]
+		info.checked = TitanGetVar(TITAN_BRONZE_ID, "ViewAll");
 		info.func = function()
 			ViewAll_Toggle()
 		end
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 		info = {};
-		info.text = L["TITAN_GOLD_TOGGLE_PLAYER_TEXT"]
-		info.checked = not TitanGetVar(TITAN_GOLD_ID, "ViewAll");
+		info.text = L["TITAN_BRONZE_TOGGLE_PLAYER_TEXT"]
+		info.checked = not TitanGetVar(TITAN_BRONZE_ID, "ViewAll");
 		info.func = function()
 			ViewAll_Toggle()
 		end
@@ -946,7 +946,7 @@ local function CreateMenu()
 		-- Display options
 		info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_TOOLTIP_DISPLAY_OPTIONS"];
+		info.text = L["TITAN_BRONZE_TOOLTIP_DISPLAY_OPTIONS"];
 		info.value = "Display_Options";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
@@ -956,14 +956,14 @@ local function CreateMenu()
 		-- Show / delete toons
 		info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_SHOW_PLAYER"];
+		info.text = L["TITAN_BRONZE_SHOW_PLAYER"];
 		info.value = "ToonShow";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 		info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_DELETE_PLAYER"];
+		info.text = L["TITAN_BRONZE_DELETE_PLAYER"];
 		info.value = "ToonDelete";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
@@ -973,13 +973,13 @@ local function CreateMenu()
 		-- Option to clear the enter database
 		info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_CLEAR_DATA_TEXT"];
-		info.func = TitanGold_ClearDB;
+		info.text = L["TITAN_BRONZE_CLEAR_DATA_TEXT"];
+		info.func = TitanBronze_ClearDB;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
-		TitanPanelRightClickMenu_AddCommand(L["TITAN_GOLD_RESET_SESS_TEXT"], TITAN_GOLD_ID, ResetSession);
+		TitanPanelRightClickMenu_AddCommand(L["TITAN_BRONZE_RESET_SESS_TEXT"], TITAN_BRONZE_ID, ResetSession);
 
-		TitanPanelRightClickMenu_AddControlVars(TITAN_GOLD_ID)
+		TitanPanelRightClickMenu_AddControlVars(TITAN_BRONZE_ID)
 	end
 
 	-- Second (2nd) level for show / delete | sort by
@@ -987,12 +987,12 @@ local function CreateMenu()
 		and TitanPanelRightClickMenu_GetDropdMenuValue() == "ToonDelete" then
 		local info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_FACTION_PLAYER_ALLY"];
+		info.text = L["TITAN_BRONZE_FACTION_PLAYER_ALLY"];
 		info.value = "DeleteAlliance";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
-		info.text = L["TITAN_GOLD_FACTION_PLAYER_HORDE"];
+		info.text = L["TITAN_BRONZE_FACTION_PLAYER_HORDE"];
 		info.value = "DeleteHorde";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
@@ -1000,12 +1000,12 @@ local function CreateMenu()
 		and TitanPanelRightClickMenu_GetDropdMenuValue() == "ToonShow" then
 		local info = {};
 		info.notCheckable = true
-		info.text = L["TITAN_GOLD_FACTION_PLAYER_ALLY"];
+		info.text = L["TITAN_BRONZE_FACTION_PLAYER_ALLY"];
 		info.value = "ShowAlliance";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
-		info.text = L["TITAN_GOLD_FACTION_PLAYER_HORDE"];
+		info.text = L["TITAN_BRONZE_FACTION_PLAYER_HORDE"];
 		info.value = "ShowHorde";
 		info.hasArrow = 1;
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
@@ -1013,16 +1013,16 @@ local function CreateMenu()
 		and TitanPanelRightClickMenu_GetDropdMenuValue() == "Sorting" then
 		-- Show gold only option - no silver, no copper
 		local info = {};
-		info.text = L["TITAN_GOLD_TOGGLE_SORT_GOLD"]
-		info.checked = not TitanGetVar(TITAN_GOLD_ID, "SortByName");
+		info.text = L["TITAN_BRONZE_TOGGLE_SORT_BRONZE"]
+		info.checked = not TitanGetVar(TITAN_BRONZE_ID, "SortByName");
 		info.func = function()
 			Sort_Toggle()
 		end
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 
 		local info = {};
-		info.text = L["TITAN_GOLD_TOGGLE_SORT_NAME"]
-		info.checked = TitanGetVar(TITAN_GOLD_ID, "SortByName");
+		info.text = L["TITAN_BRONZE_TOGGLE_SORT_NAME"]
+		info.checked = TitanGetVar(TITAN_BRONZE_ID, "SortByName");
 		info.func = function()
 			Sort_Toggle()
 		end
@@ -1031,10 +1031,10 @@ local function CreateMenu()
 		TitanPanelRightClickMenu_AddSeparator(TitanPanelRightClickMenu_GetDropdownLevel());
 
 		local info = {};
-		info.text = L["TITAN_GOLD_GROUP_BY_REALM"];
-		info.checked = TitanGetVar(TITAN_GOLD_ID, "GroupByRealm")
+		info.text = L["TITAN_BRONZE_GROUP_BY_REALM"];
+		info.checked = TitanGetVar(TITAN_BRONZE_ID, "GroupByRealm")
 		info.func = function()
-			TitanToggleVar(TITAN_GOLD_ID, "GroupByRealm")
+			TitanToggleVar(TITAN_BRONZE_ID, "GroupByRealm")
 		end
 		TitanPanelRightClickMenu_AddButton(info, TitanPanelRightClickMenu_GetDropdownLevel());
 	elseif TitanPanelRightClickMenu_GetDropdownLevel() == 2 
@@ -1056,31 +1056,31 @@ end
 
 --[[
 -- *******************************************************************************************
--- NAME: FindGold()
+-- NAME: FindBronze()
 -- DESC: This routines determines which gold total the ui wants (server or player) then calls it and returns it
 -- *******************************************************************************************
 --]]
-local function FindGold()
-	if (not GOLD_INITIALIZED) then
+local function FindBronze()
+	if (not BRONZE_INITIALIZED) then
 		-- in case there is no db entry for this toon, return blank.
-		-- When Gold is ready it will init
+		-- When Bronze is ready it will init
 		return ""
 	end
 
 	local ret_str = ""
 	local ttlgold = 0;
 
-	GoldSave[GOLD_INDEX].gold = GetMoney()
+	BronzeSave[BRONZE_INDEX].gold = GetMoney()
 
-	if TitanGetVar(TITAN_GOLD_ID, "ViewAll") then
-		ttlgold = TotalGold()
+	if TitanGetVar(TITAN_BRONZE_ID, "ViewAll") then
+		ttlgold = TotalBronze()
 	else
 		ttlgold = GetMoney();
 	end
 
 	ret_str = NiceCash(ttlgold, true, false)
 
-	return L["TITAN_GOLD_MENU_TEXT"]..": "..FONT_COLOR_CODE_CLOSE, ret_str
+	return L["TITAN_BRONZE_MENU_TEXT"]..": "..FONT_COLOR_CODE_CLOSE, ret_str
 end
 
 --[[
@@ -1095,15 +1095,15 @@ local function OnLoad(self)
 		.."- Can show by server / merged servers / all servers.\n"
 		.."- Can show by faction.\n"
 	self.registry = {
-		id = TITAN_GOLD_ID,
+		id = TITAN_BRONZE_ID,
 		category = "Built-ins",
-		version = TITAN_GOLD_VERSION,
-		menuText = L["TITAN_GOLD_MENU_TEXT"],
+		version = TITAN_BRONZE_VERSION,
+		menuText = L["TITAN_BRONZE_MENU_TEXT"],
 		menuTextFunction = CreateMenu,
-		tooltipTitle = L["TITAN_GOLD_TOOLTIP"],
+		tooltipTitle = L["TITAN_BRONZE_TOOLTIP"],
 		tooltipTextFunction = GetTooltipText,
-		buttonTextFunction = FindGold,
-		icon = "Interface\\AddOns\\TitanGold\\Artwork\\TitanGold",
+		buttonTextFunction = FindBronze,
+		icon = "Interface\\AddOns\\TitanBronze\\Artwork\\TitanBronze",
 		iconWidth = 16,
 		notes = notes,
 		controlVariables = {
@@ -1115,11 +1115,11 @@ local function OnLoad(self)
 		},
 		savedVariables = {
 			Initialized = true,
-			DisplayGoldPerHour = true,
+			DisplayBronzePerHour = true,
 			ShowCoinNone = false,
 			ShowCoinLabels = true,
 			ShowCoinIcons = false,
-			ShowGoldOnly = false,
+			ShowBronzeOnly = false,
 			SortByName = true,
 			ViewAll = true,
 			ShowIcon = true,
@@ -1140,12 +1140,12 @@ local function OnLoad(self)
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
-	if (not GoldSave) then
-		GoldSave={};
+	if (not BronzeSave) then
+		BronzeSave={};
 	end
 	
 	-- Faction is English to use as index NOT display
-	GOLD_INDEX = UnitName("player").."_"..realmName.."::"..UnitFactionGroup("Player");
+	BRONZE_INDEX = UnitName("player").."_"..realmName.."::"..UnitFactionGroup("Player");
 end
 
 --[[
@@ -1156,12 +1156,12 @@ end
 --]]
 local function OnShow(self)
 	self:RegisterEvent("PLAYER_MONEY");
-	if GoldSave and TitanGetVar(TITAN_GOLD_ID, "DisplayGoldPerHour") then
-		if GoldTimerRunning then
+	if BronzeSave and TitanGetVar(TITAN_BRONZE_ID, "DisplayBronzePerHour") then
+		if BronzeTimerRunning then
 			-- Do not start a new one
 		else
-			GoldTimer = AceTimer:ScheduleRepeatingTimer(TitanPanelPluginHandle_OnUpdate, 1, updateTable)
-			GoldTimerRunning = true
+			BronzeTimer = AceTimer:ScheduleRepeatingTimer(TitanPanelPluginHandle_OnUpdate, 1, updateTable)
+			BronzeTimerRunning = true
 		end
 	else
 		-- timer running or user does not want gold per hour
@@ -1176,8 +1176,8 @@ end
 --]]
 local function OnHide(self)
 	self:UnregisterEvent("PLAYER_MONEY");
-	AceTimer:CancelTimer(GoldTimer)
-	GoldTimerRunning = false
+	AceTimer:CancelTimer(BronzeTimer)
+	BronzeTimerRunning = false
 end
 
 --[[
@@ -1193,18 +1193,18 @@ print("_OnEvent"
 )
 --]]
 	if (event == "PLAYER_MONEY") then
-		if (GOLD_INITIALIZED) then
-			GoldSave[GOLD_INDEX].gold = GetMoney()
-			TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+		if (BRONZE_INITIALIZED) then
+			BronzeSave[BRONZE_INDEX].gold = GetMoney()
+			TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 		end
 		return;
 	end
 
 	if (event == "PLAYER_ENTERING_WORLD") then
-		if (not GOLD_INITIALIZED) then
+		if (not BRONZE_INITIALIZED) then
 			Initialize_Array(self);
 		end
-		TitanPanelButton_UpdateButton(TITAN_GOLD_ID)
+		TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 		return;
 	end
 end
