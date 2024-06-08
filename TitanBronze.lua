@@ -468,7 +468,7 @@ local function TotalBronze()
 
 	if TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 		-- Parse the database and display all characters on this server
-		BronzeSave[BRONZE_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 
 		for index, money in pairs(BronzeSave) do
 			character, charserver, char_faction = GetIndexInfo(index)
@@ -485,7 +485,7 @@ local function TotalBronze()
 	elseif TitanGetVar(TITAN_BRONZE_ID, "MergeServers") then
 		-- Parse the database and display characters on merged / connected servers
 		for ms = 1, countelements do
-			BronzeSave[BRONZE_INDEX].gold = GetMoney()
+			BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 
 			for index, money in pairs(BronzeSave) do
 				character, charserver, char_faction = GetIndexInfo(index)
@@ -507,7 +507,7 @@ local function TotalBronze()
 		end
 	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		-- Parse the database and display characters on all servers
-		BronzeSave[BRONZE_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 
 		for index, money in pairs(BronzeSave) do
 			character, charserver, char_faction = GetIndexInfo(index)
@@ -555,7 +555,7 @@ local function GetTooltipText()
 	
 	if TitanGetVar(TITAN_BRONZE_ID, "SeparateServers") then
 		-- Parse the database and display characters from this server
-		BronzeSave[BRONZE_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 		local char_faction = ""
 		local character, charserver = "", ""
 
@@ -575,7 +575,7 @@ local function GetTooltipText()
 		-- Parse the database and display characters from merged / connected servers
 		for ms = 1, countelements do
 			local server = realmNames[ms]
-			BronzeSave[BRONZE_INDEX].gold = GetMoney()
+			BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 			local character, charserver = "", ""
 			local char_faction = ""
 
@@ -599,7 +599,7 @@ local function GetTooltipText()
 		end
 	elseif TitanGetVar(TITAN_BRONZE_ID, "AllServers") then
 		-- Parse the database and display characters from all servers
-		BronzeSave[BRONZE_INDEX].gold = GetMoney()
+		BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 		local character, charserver = "", ""
 		local char_faction = ""
 
@@ -717,7 +717,7 @@ print("TG"
 		..L["TITAN_BRONZE_TTL_BRONZE"].."\t"..coin_str
 
 	-- find session earnings and earning per hour
-	local sesstotal = GetMoney() - BRONZE_STARTINGBRONZE;
+	local sesstotal = C_CurrencyInfo.GetCurrencyInfo(2778).quantity - BRONZE_STARTINGBRONZE;
 	local negative = false;
 	if (sesstotal < 0) then
 		sesstotal = math.abs(sesstotal);
@@ -820,7 +820,7 @@ end
 -- *******************************************************************************************
 --]]
 local function ResetSession()
-	BRONZE_STARTINGBRONZE = GetMoney();
+	BRONZE_STARTINGBRONZE = C_CurrencyInfo.GetCurrencyInfo(2778).quantity;
 	BRONZE_SESSIONSTART = GetTime();
 	DEFAULT_CHAT_FRAME:AddMessage(TitanUtils_GetGreenText(L["TITAN_BRONZE_SESSION_RESET"]));
 end
@@ -839,7 +839,7 @@ local function Initialize_Array(self)
 	-- See if this is a new to toon to Bronze
 	if (BronzeSave[BRONZE_INDEX] == nil) then
 		BronzeSave[BRONZE_INDEX] = {}
-		BronzeSave[BRONZE_INDEX] = {gold = GetMoney(), name = UnitName("player")}
+		BronzeSave[BRONZE_INDEX] = {gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity, name = UnitName("player")}
 	end
 	
 	-- Ensure the saved vars are usable
@@ -873,7 +873,7 @@ local function Initialize_Array(self)
 		end
 --]]
 	end
-	BRONZE_STARTINGBRONZE = GetMoney();
+	BRONZE_STARTINGBRONZE = C_CurrencyInfo.GetCurrencyInfo(2778).quantity;
 	BRONZE_SESSIONSTART = GetTime();
 	BRONZE_INITIALIZED = true;
 
@@ -1070,12 +1070,12 @@ local function FindBronze()
 	local ret_str = ""
 	local ttlgold = 0;
 
-	BronzeSave[BRONZE_INDEX].gold = GetMoney()
+	BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 
 	if TitanGetVar(TITAN_BRONZE_ID, "ViewAll") then
 		ttlgold = TotalBronze()
 	else
-		ttlgold = GetMoney();
+		ttlgold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity;
 	end
 
 	ret_str = NiceCash(ttlgold, true, false)
@@ -1194,7 +1194,7 @@ print("_OnEvent"
 --]]
 	if (event == "PLAYER_MONEY") then
 		if (BRONZE_INITIALIZED) then
-			BronzeSave[BRONZE_INDEX].gold = GetMoney()
+			BronzeSave[BRONZE_INDEX].gold = C_CurrencyInfo.GetCurrencyInfo(2778).quantity
 			TitanPanelButton_UpdateButton(TITAN_BRONZE_ID)
 		end
 		return;
